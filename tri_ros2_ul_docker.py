@@ -21,13 +21,13 @@ from sensor_msgs.msg            import Range
 from nav_msgs.msg               import Odometry
 from rclpy.clock                import Clock
 from rclpy.duration             import Duration
-from depthai_ros_msgs.msg       import SpatialDetectionArray, SpatialDetection
+# from depthai_ros_msgs.msg       import SpatialDetectionArray, SpatialDetection
 from rclpy.qos                  import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 import copy
 import numpy                    as np
 import matplotlib.pyplot        as plt
-from itertools                  import combinations
+# from itertools                  import combinations
 from tensorflow                 import keras
 
 from utlis                      import utils
@@ -97,7 +97,7 @@ class UWBTriangulation(Node) :
         self.pos_estimation         = []
         self.computation_time       = []
         
-        self.model                  =  keras.models.load_model('/home/jqzhang/FILES/Research/R3Swarms/uwb-nn-estimation/models/lstm_uwb_0')
+        self.model                  =  keras.models.load_model('./models/lstm_uwb_0')
         self.lstm_input             = []
         self.n_steps                = 10 # 30
         self.uwb_lstm_ranges        = []
