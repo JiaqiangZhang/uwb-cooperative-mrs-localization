@@ -18,8 +18,9 @@ from nav_msgs.msg               import Odometry
 
 from tensorflow                 import keras
 
+from utlis                      import utils
 
-
+# ???? ["4", "7", "1", "2", "3", "5"]
 turtles         = ["4", "1", "2"  , "3", "5"]
 
 uwbs            = ["4", "1", "2"  , "3", "5"]
@@ -32,7 +33,7 @@ uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4)
 #  get parameters from terminal
 def parse_args():
     parser = argparse.ArgumentParser(description='Options to control relative localization with only UWB, assisit with Vision, and all if vision available')
-    parser.add_argument('--with_model', type=utils.str2bool, default=False, help=' choose to model the uwb error or not')
+    parser.add_argument('--with_model', type=utils.str2bool, default=True, help=' choose to model the uwb error or not')
     args = parser.parse_args()
     return args
 
@@ -63,9 +64,9 @@ class UWBLSTMRangeCorrection(Node):
         self.turtles_mocaps         = [np.zeros(6) for _ in turtles]
   
         if args.with_model:
-            self.models                 = [keras.models.load_model('/home/xianjia/Workspace/temp/lstm_ws/lstm_uwb_{}'.format(inx)) for inx in range(len(uwb_pair))]
+            self.models                 = [keras.models.load_model('./models/lstm_uwb_{}'.format(inx)) for inx in range(len(uwb_pair))]
             self.lstm_inputs            = [[] for _ in uwb_pair]
-            self.n_steps                = 30
+            self.n_steps                = 10
             self.uwb_lstm_ranges        = []
             self.uwb_real               = []
             self.uwb_inputs             = []
@@ -82,12 +83,15 @@ class UWBLSTMRangeCorrection(Node):
         # subscribe to uwb ranges 
         self.uwb_subs = [
             self.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
-            self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
+            self.create_uwb_ranges_cb(i, p),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.get_logger().info("{} UWB ranges subscribed!".format(len(self.uwb_ranges)))
 
-        self.uwb_publishers = [self.create_publisher(Range, "/corrected_uwb/tof/n_{}/n_{}/distance/replica".format(p[0], p[1]),  qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
+        self.uwb_publishers = [self.create_publisher(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]),  qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
 
-    def uwb_range_cb(self, i, range):
+    def create_uwb_ranges_cb(self, i, p):
+        return lambda range : self.uwb_range_cb(i, p, range)
+
+    def uwb_range_cb(self, i, p, range):
         self.uwb_ranges[i] = range.range
         # self.uwb_inputs = self.cal_lstm_input()
         if args.with_model:
@@ -104,6 +108,15 @@ class UWBLSTMRangeCorrection(Node):
                 self.uwb_ranges[i] = self.uwb_ranges[i] 
         else:
             self.uwb_ranges[i] = self.uwb_ranges[i]
+
+        corrected_uwb = self.uwb_ranges[i]
+        corrected_uwb.header.stamp = self.get_clock().now().to_msg()
+        self.uwb_publishers[i].publish(corrected_uwb)
+
+        # for j in range(len(uwb_pair)):
+
+
+            # self.uwb_publishers[j].publish(self.uwb_ranges[i])
         # TODO: Add corrected range publisher here.
         
 

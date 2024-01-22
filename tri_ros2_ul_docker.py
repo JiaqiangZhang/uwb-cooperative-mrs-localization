@@ -41,9 +41,9 @@ uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (0,5), (1,2), (1,3), (1,4), (1,5)
 #  get parameters from terminal
 def parse_args():
     parser = argparse.ArgumentParser(description='Options for triangulations to calculate the relative position of robots based on UWB rangessss')
-    parser.add_argument('--poses_save', type=bool, default=True, help='choose to save the estimated poses with triangulation')
-    parser.add_argument('--computation_save', type=bool, default=True, help='choose to save the computation time with triangulation')
-    parser.add_argument('--with_model', type=utils.str2bool, default=True, help=' choose to model the uwb error or not')
+    parser.add_argument('--poses_save', type=bool, default=False, help='choose to save the estimated poses with triangulation')
+    parser.add_argument('--computation_save', type=bool, default=False, help='choose to save the computation time with triangulation')
+    parser.add_argument('--with_model', type=utils.str2bool, default=False, help=' choose to model the uwb error or not')
     parser.add_argument('--round', type=int, default=0, help='indicate which round the pf will run on a recorded data')
     args = parser.parse_args()
     return args
@@ -108,7 +108,7 @@ class UWBTriangulation(Node) :
         self.node.get_logger().info("Subscribing to topics")
         # subscribe to uwb ranges 
         self.uwb_subs = [
-            self.node.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
+            self.node.create_subscription(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
             self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.node.get_logger().info("{} UWB ranges received!".format(len(self.uwb_ranges)))
 
