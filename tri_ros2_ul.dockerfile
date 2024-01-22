@@ -30,9 +30,10 @@ RUN mkdir -p /app/results/results_csv/triangulation/computation \
 # RUN mkdir -p /app/results/results_csv/triangulation/computation \
 #              /app/results/results_csv/triangulation/pos/pos_tri \
 #              /app/models
-COPY lstm_uwb_0 /app/models/lstm_uwb_0
+# COPY lstm_uwb_0 /app/models/lstm_uwb_0
+COPY models /app/models
 
-CMD ["python3", "/app/tri_ros2_ul_docker.py"]
+CMD ["python3", "/app/tri_ros2_ul_docker.py", "--with_model", "False"]
 
 ####### , "--with_model", "False", "--poses_save", "--computation_save"
 
