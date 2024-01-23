@@ -27,7 +27,13 @@ uwbs            = ["4", "1", "2"  , "3", "5"]
 uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
 
 uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
-# uwb_odoms       = [(2,1), (3,1), (0,1), (2,3), (0,2), (0,3), (1,0), (2,0), (3,0), (1,0)]
+uwb_odoms       = [(2,1), (3,1), (0,1), (2,3), (0,2), (0,3), (1,0), (2,0), (3,0), (1,0)]
+
+# turtles         = ["4", "7", "1", "2", "3", "5"]
+# uwbs            = ["4", "7", "1", "2", "3", "5"]
+# uwb_pair        = [(4,7), (4,1), (4,2), (4,3), (4,5), (7,1), (7,2), (7,3), (7,5), (1,2), (1,3), (1,5), (2,3),(2,5), (3,5)]
+# num_turtles     = 6
+# uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (0,5), (1,2), (1,3), (1,4), (1,5),(2,3), (2,4), (2,5), (3,4),(3,5), (4,5)]
 
 
 #  get parameters from terminal
@@ -50,7 +56,7 @@ class UWBLSTMRangeCorrection(Node):
             Define the parameters, publishers, and subscribers
         '''
         # Init node
-        super().__init__('uwb-lstm-range-correction')
+        super().__init__('uwb_lstm_range_correction')
         # Define QoS profile for odom and UWB subscribers
         self.qos = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -83,18 +89,33 @@ class UWBLSTMRangeCorrection(Node):
         # subscribe to uwb ranges 
         self.uwb_subs = [
             self.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
-            self.create_uwb_ranges_cb(i, p),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
+            self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.get_logger().info("{} UWB ranges subscribed!".format(len(self.uwb_ranges)))
 
         self.uwb_publishers = [self.create_publisher(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]),  qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
 
-    def create_uwb_ranges_cb(self, i, p):
-        return lambda range : self.uwb_range_cb(i, p, range)
+    def create_mocap_pose_cb(self, i):
+        return lambda pos : self.mocap_pose_cb(i, pos)
+        
+    def mocap_pose_cb(self, i, pos):
+        self.turtles_mocaps[i] = np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.orientation.x, pos.pose.orientation.y, pos.pose.orientation.z, pos.pose.orientation.w])  
+        # true_relative_pos = pos
+        # true_relative_pos.header.stamp = self.get_clock().now().to_msg()
+        # true_relative_pos.pose.position.x =  pos.pose.position.x - self.turtles_mocaps[0][0]
+        # true_relative_pos.pose.position.y =  pos.pose.position.y - self.turtles_mocaps[0][1]
+        # true_relative_pos.pose.position.z = 0.0
+        # self.real_pose_publishers[i].publish(true_relative_pos)
 
-    def uwb_range_cb(self, i, p, range):
+    def create_uwb_ranges_cb(self, i):
+        return lambda range : self.uwb_range_cb(i, range)
+
+    def uwb_range_cb(self, i, range):
+        # print("range", range)
         self.uwb_ranges[i] = range.range
+        # print("before lstm self.uwb_ranges[i]", self.uwb_ranges[i], i)
         # self.uwb_inputs = self.cal_lstm_input()
         if args.with_model:
+            # print(self.uwb_ranges[i])
             node1_mocap = self.turtles_mocaps[uwb_turtles[i][0]] 
             node2_mocap = self.turtles_mocaps[uwb_turtles[i][1]]
             node1_yaws = utils.euler_from_quaternion(np.array([node1_mocap[2], node1_mocap[3], node1_mocap[4],node1_mocap[5]]))
@@ -103,14 +124,20 @@ class UWBLSTMRangeCorrection(Node):
             if len(self.lstm_inputs[i]) > self.n_steps:
                 lstm_input_arr = np.array(self.lstm_inputs[i][-self.n_steps:])
                 bia = self.models[i].predict(np.reshape(lstm_input_arr,(1, self.n_steps, 3)), verbose = 0)
-                self.uwb_ranges[i] = self.uwb_ranges[i] - bia[0]
+                # print("bia", bia, bia[0]) # bia is 2d array
+                self.uwb_ranges[i] = self.uwb_ranges[i] - bia[0][0]
+                # print("-bia self.uwb_ranges[i]", self.uwb_ranges[i], i)
             else:
-                self.uwb_ranges[i] = self.uwb_ranges[i] 
+                self.uwb_ranges[i] = self.uwb_ranges[i] - 0.32
         else:
             self.uwb_ranges[i] = self.uwb_ranges[i]
 
-        corrected_uwb = self.uwb_ranges[i]
+        # print("after self.uwb_ranges[i]", self.uwb_ranges[i], i)
+        corrected_uwb = range
+        corrected_uwb.range = self.uwb_ranges[i]
+        # print("corrected_uwb.range", corrected_uwb.range)
         corrected_uwb.header.stamp = self.get_clock().now().to_msg()
+        # print("corrected_uwb_range", corrected_uwb)
         self.uwb_publishers[i].publish(corrected_uwb)
 
         # for j in range(len(uwb_pair)):
