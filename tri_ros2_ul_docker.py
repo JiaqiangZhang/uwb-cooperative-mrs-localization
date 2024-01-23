@@ -427,21 +427,36 @@ class UWBTriangulation(Node) :
         dists = np.zeros((uwb_num+1,uwb_num+1))
         # 7,3,4,5,2
         # 4,7, 1,2,3,5
+
+        # original
+        # dists[0][1],dists[1][0]=uwb_ranges[0],uwb_ranges[0]
+        # dists[0][2],dists[2][0]=uwb_ranges[1],uwb_ranges[1]
+        # dists[0][3],dists[3][0]=uwb_ranges[2],uwb_ranges[2]
+        # dists[0][4],dists[4][0]=uwb_ranges[3],uwb_ranges[3]
+        # dists[0][5],dists[5][0]=uwb_ranges[4],uwb_ranges[4]
+        # dists[1][2],dists[2][1]=uwb_ranges[5],uwb_ranges[5]
+        # dists[1][3],dists[3][1]=uwb_ranges[6],uwb_ranges[6]
+        # dists[1][4],dists[4][1]=uwb_ranges[7],uwb_ranges[7]
+        # dists[1][5],dists[5][1]=uwb_ranges[8],uwb_ranges[8]
+        # dists[2][3],dists[3][2]=uwb_ranges[9],uwb_ranges[9]
+        # dists[2][4],dists[4][2]=uwb_ranges[10],uwb_ranges[10]
+        # dists[2][5],dists[5][2]=uwb_ranges[11],uwb_ranges[11]
+        # dists[3][4],dists[4][3]=uwb_ranges[12],uwb_ranges[12]
+        # dists[3][5],dists[5][3]=uwb_ranges[13],uwb_ranges[13]
+        # dists[4][5],dists[5][4]=uwb_ranges[14],uwb_ranges[14]
+
+        # new
         dists[0][1],dists[1][0]=uwb_ranges[0],uwb_ranges[0]
         dists[0][2],dists[2][0]=uwb_ranges[1],uwb_ranges[1]
         dists[0][3],dists[3][0]=uwb_ranges[2],uwb_ranges[2]
         dists[0][4],dists[4][0]=uwb_ranges[3],uwb_ranges[3]
-        dists[0][5],dists[5][0]=uwb_ranges[4],uwb_ranges[4]
-        dists[1][2],dists[2][1]=uwb_ranges[5],uwb_ranges[5]
-        dists[1][3],dists[3][1]=uwb_ranges[6],uwb_ranges[6]
-        dists[1][4],dists[4][1]=uwb_ranges[7],uwb_ranges[7]
-        dists[1][5],dists[5][1]=uwb_ranges[8],uwb_ranges[8]
-        dists[2][3],dists[3][2]=uwb_ranges[9],uwb_ranges[9]
-        dists[2][4],dists[4][2]=uwb_ranges[10],uwb_ranges[10]
-        dists[2][5],dists[5][2]=uwb_ranges[11],uwb_ranges[11]
-        dists[3][4],dists[4][3]=uwb_ranges[12],uwb_ranges[12]
-        dists[3][5],dists[5][3]=uwb_ranges[13],uwb_ranges[13]
-        dists[4][5],dists[5][4]=uwb_ranges[14],uwb_ranges[14]
+        dists[1][2],dists[2][1]=uwb_ranges[4],uwb_ranges[4]
+        dists[1][3],dists[3][1]=uwb_ranges[5],uwb_ranges[5]
+        dists[1][4],dists[4][1]=uwb_ranges[6],uwb_ranges[6]
+        dists[2][3],dists[3][2]=uwb_ranges[7],uwb_ranges[7]
+        dists[2][5],dists[5][2]=uwb_ranges[8],uwb_ranges[8]
+        dists[3][5],dists[5][3]=uwb_ranges[9],uwb_ranges[9]
+
         # uwb_pair        = [(4,7), (4,1), (4,2), (4,3), (4,5), (7,1), (7,2), (7,3), (7,5), (1,2), (1,3), (1,5), (2,3),(2,5), (3,5)]
         # uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3),(2,5), (3,5)]
         # n1 = [1,1,1,1,2,2,2,3,3,4]
