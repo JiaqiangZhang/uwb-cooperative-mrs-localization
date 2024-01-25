@@ -5,7 +5,7 @@ import time
 import math
 import argparse
 import numpy                    as np
-import matplotlib.pyplot        as plt
+# import matplotlib.pyplot        as plt
 import itertools
 import copy
 
@@ -16,11 +16,11 @@ from rclpy.qos                  import QoSProfile, ReliabilityPolicy, HistoryPol
 from geometry_msgs.msg          import PoseStamped
 from sensor_msgs.msg            import Range
 from nav_msgs.msg               import Odometry
-from depthai_ros_msgs.msg       import SpatialDetectionArray
+# from depthai_ros_msgs.msg       import SpatialDetectionArray
 
 from pfilter                    import ParticleFilter, squared_error
 
-from tensorflow                 import keras
+# from tensorflow                 import keras
 
 from utlis                      import utils
 
@@ -43,9 +43,9 @@ uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4)
 def parse_args():
     parser = argparse.ArgumentParser(description='Options to control relative localization with only UWB, assisit with Vision, and all if vision available')
     parser.add_argument('--poses_pub', type=bool, default=True, help='choose to publish the estimated poses with pf')
-    parser.add_argument('--poses_save', type=bool, default=True, help='choose to save the estimated poses with pf')
+    parser.add_argument('--poses_save', type=bool, default=False, help='choose to save the estimated poses with pf')
     parser.add_argument('--images_save', type=bool, default=False, help='choose to save the images with pf')
-    parser.add_argument('--computation_save', type=bool, default=True, help='choose to save the computation time with pf')
+    parser.add_argument('--computation_save', type=bool, default=False, help='choose to save the computation time with pf')
     parser.add_argument('--fuse_group', type=int, default=0, help='0: only UWB in PF, 1: uwb and vision together')
     parser.add_argument('--with_model', type=utils.str2bool, default=False, help=' choose to model the uwb error or not')
     parser.add_argument('--round', type=int, default=0, help='indicate which round the pf will run on a recorded data')
@@ -123,7 +123,7 @@ class UWBParticleFilter(Node) :
         self.turtles_odoms_flag     = [False for _ in turtles]
         self.turtles_odoms          = [Odometry() for _ in turtles]
         self.last_turtles_odoms     = [Odometry() for _ in turtles]
-        self.spatial_objects        = {t:np.array([]) for t in turtles}
+        # self.spatial_objects        = {t:np.array([]) for t in turtles}
         self.true_relative_poses    = [np.zeros(2) for _ in range(1,len(turtles))]
         self.relative_poses         = [np.zeros(2) for _ in range(1,len(turtles))]
         self.particle_odom          = np.array([0.001]*self.num_states)
@@ -136,19 +136,19 @@ class UWBParticleFilter(Node) :
         self.sp_temp                = []
         self.computation_time       = []
         self.poly_coefficient       = [ 2.30932370e-13,  1.03347377e-11, -9.03676014e-08,  2.61712111e-05,  -2.07631167e-03,  2.15006000e-01]
-        if args.with_model:
-            self.models                 = [keras.models.load_model('/home/xianjia/Workspace/temp/lstm_ws/lstm_uwb_{}'.format(inx)) for inx in range(len(uwb_pair))]
-            self.lstm_inputs            = [[] for _ in uwb_pair]
-            self.n_steps                = 30
-            self.uwb_lstm_ranges        = []
-            self.uwb_real               = []
-            self.uwb_inputs             = []
-            time.sleep(1.0)
+        # if args.with_model:
+        #     self.models                 = [keras.models.load_model('/home/xianjia/Workspace/temp/lstm_ws/lstm_uwb_{}'.format(inx)) for inx in range(len(uwb_pair))]
+        #     self.lstm_inputs            = [[] for _ in uwb_pair]
+        #     self.n_steps                = 30
+        #     self.uwb_lstm_ranges        = []
+        #     self.uwb_real               = []
+        #     self.uwb_inputs             = []
+        #     time.sleep(1.0)
 
         self.get_logger().info("Subscribing to topics......")
         # subscribe to uwb ranges 
         self.uwb_subs = [
-            self.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
+            self.create_subscription(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
             self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.get_logger().info("{} UWB ranges subscribed!".format(len(self.uwb_ranges)))
 
@@ -164,11 +164,11 @@ class UWBParticleFilter(Node) :
             self.create_odom_cb(i), qos_profile=self.qos) for i, t in enumerate(turtles)]
         self.get_logger().info("{} odom poses subscribed!".format(len(self.turtles_odoms)))
 
-        # subscribe to spatial detections
-        self.spatial_subs = [
-            self.create_subscription(SpatialDetectionArray, "/turtle0{}/color/yolov4_Spatial_detections".format(t), 
-            self.create_spatial_cb(i), qos_profile=self.qos) for i, t in enumerate(turtles)]
-        self.get_logger().info("{} spatial detections subscribed!".format(len(self.spatial_objects)))
+        # # subscribe to spatial detections
+        # self.spatial_subs = [
+        #     self.create_subscription(SpatialDetectionArray, "/turtle0{}/color/yolov4_Spatial_detections".format(t), 
+        #     self.create_spatial_cb(i), qos_profile=self.qos) for i, t in enumerate(turtles)]
+        # self.get_logger().info("{} spatial detections subscribed!".format(len(self.spatial_objects)))
 
         timer_period = 1/20.0
         # self.pub_timer = self.create_timer(timer_period, self.pub_timer_callback)
@@ -225,11 +225,11 @@ class UWBParticleFilter(Node) :
         self.turtles_odoms_flag[i] = True
         self.turtles_odoms[i] = odom
 
-    def create_spatial_cb(self, i):
-        return lambda detections : self.spatial_cb(i, detections)
+    # def create_spatial_cb(self, i):
+    #     return lambda detections : self.spatial_cb(i, detections)
         
-    def spatial_cb(self, i, detections):
-        self.spatial_objects[turtles[i]] = np.array(detections.detections)
+    # def spatial_cb(self, i, detections):
+    #     self.spatial_objects[turtles[i]] = np.array(detections.detections)
 
     def relative_pose_cal(self, origin, ends, relative_poses):
         for inx, end in enumerate(ends):
@@ -341,36 +341,36 @@ class UWBParticleFilter(Node) :
         # save groundtruth poses and calcuated poses to csv
         self.pos_estimation.append(relative_poses)
 
-    def plot_particles(self):
-        """Plot a 1D tracking result as a line graph with overlaid
-        scatterplot of particles. Particles are sized according to
-        normalised weight at each step.
-            x: time values
-            y: original (uncorrupted) values
-            yn: noisy (observed) values
-            states: dictionary return from apply_pfilter        
-        """
+    # def plot_particles(self):
+    #     """Plot a 1D tracking result as a line graph with overlaid
+    #     scatterplot of particles. Particles are sized according to
+    #     normalised weight at each step.
+    #         x: time values
+    #         y: original (uncorrupted) values
+    #         yn: noisy (observed) values
+    #         states: dictionary return from apply_pfilter        
+    #     """
 
-        plt.ioff()
-        plt.clf()
+    #     plt.ioff()
+    #     plt.clf()
 
-        symbols = ['x', 'o', '*']
-        symbol_colors =['black', 'darkgray', 'lightgray']
-        legends = [["T1_G", "T1_Mean", "T1_Map", "T1_Particles"],
-                   ["T3_G", "T3_Mean", "T3_Map", "T3_Particles"],
-                   ["T4_G", "T4_Mean", "T4_Map", "T4_Particles"]]
-        for i in range(len(self.true_relative_poses)):
-            plt.plot(self.true_relative_poses[i][0], self.true_relative_poses[i][1], symbols[i], c='red', label=legends[i][0])
-            plt.plot(self.pf.mean_state[2*i], self.pf.mean_state[2*i+1], symbols[i], c='green', label=legends[i][1])
-            plt.plot(self.pf.map_state[2*i], self.pf.map_state[2*i+1], symbols[i], c='orange', label=legends[i][2])
-            plt.scatter(self.pf.transformed_particles[:,2*i], self.pf.transformed_particles[:,2*i+1], color=symbol_colors[i], label=legends[i][3]) # lightgray
-        # print(f"particles shape:{self.pf.transformed_particles.shape}")
-        plt.xlim(-9,9)
-        plt.ylim(-9,9)
+    #     symbols = ['x', 'o', '*']
+    #     symbol_colors =['black', 'darkgray', 'lightgray']
+    #     legends = [["T1_G", "T1_Mean", "T1_Map", "T1_Particles"],
+    #                ["T3_G", "T3_Mean", "T3_Map", "T3_Particles"],
+    #                ["T4_G", "T4_Mean", "T4_Map", "T4_Particles"]]
+    #     for i in range(len(self.true_relative_poses)):
+    #         plt.plot(self.true_relative_poses[i][0], self.true_relative_poses[i][1], symbols[i], c='red', label=legends[i][0])
+    #         plt.plot(self.pf.mean_state[2*i], self.pf.mean_state[2*i+1], symbols[i], c='green', label=legends[i][1])
+    #         plt.plot(self.pf.map_state[2*i], self.pf.map_state[2*i+1], symbols[i], c='orange', label=legends[i][2])
+    #         plt.scatter(self.pf.transformed_particles[:,2*i], self.pf.transformed_particles[:,2*i+1], color=symbol_colors[i], label=legends[i][3]) # lightgray
+    #     # print(f"particles shape:{self.pf.transformed_particles.shape}")
+    #     plt.xlim(-9,9)
+    #     plt.ylim(-9,9)
 
-        plt.legend()
-        self.counter += 1
-        plt.savefig(images_save_path + "/test{}.png".format(self.counter))
+    #     plt.legend()
+    #     self.counter += 1
+    #     plt.savefig(images_save_path + "/test{}.png".format(self.counter))
 
     def cal_lstm_input(self):
         node1_mocap = [self.turtles_mocaps[ut[0]] for ut in uwb_turtles]
@@ -399,22 +399,22 @@ class UWBParticleFilter(Node) :
             temp_odom.pose.pose.position.z = 0.0
             # self.fake_odom_publishers[t].publish(temp_odom)
 
-    def update_vision_measurements(self):
-        uwb_ranges = copy.deepcopy(self.uwb_ranges)
-        self.vis_meas_list.clear()
-        if args.fuse_group == 1:
-            for p in spatial_pair:
-                spatial_dict[p].clear()
-                if self.spatial_objects[p[0]].size > 0 and self.spatial_objects[p[1]].size > 0:
-                    for obj in itertools.product(self.spatial_objects[p[0]], self.spatial_objects[p[1]]):
-                            vis_meas = self.update_range_from_object_pose(obj[0], obj[1])
-                            if math.fabs(vis_meas -  uwb_ranges[spatial_uwb[p]]) < self.vis_thresh:
-                                self.num_vision_found+=1
-                                if not self.vision_flag:
-                                    spatial_dict[p].extend([[obj[0], obj[1]]])
-                                    # vis_meas_list.append(vis_meas)
-                                    self.vis_meas_list.append(obj[1].position.x - obj[0].position.x)
-                                    self.vis_meas_list.append(obj[1].position.y - obj[0].position.y)
+    # def update_vision_measurements(self):
+    #     uwb_ranges = copy.deepcopy(self.uwb_ranges)
+    #     self.vis_meas_list.clear()
+    #     if args.fuse_group == 1:
+    #         for p in spatial_pair:
+    #             spatial_dict[p].clear()
+    #             if self.spatial_objects[p[0]].size > 0 and self.spatial_objects[p[1]].size > 0:
+    #                 for obj in itertools.product(self.spatial_objects[p[0]], self.spatial_objects[p[1]]):
+    #                         vis_meas = self.update_range_from_object_pose(obj[0], obj[1])
+    #                         if math.fabs(vis_meas -  uwb_ranges[spatial_uwb[p]]) < self.vis_thresh:
+    #                             self.num_vision_found+=1
+    #                             if not self.vision_flag:
+    #                                 spatial_dict[p].extend([[obj[0], obj[1]]])
+    #                                 # vis_meas_list.append(vis_meas)
+    #                                 self.vis_meas_list.append(obj[1].position.x - obj[0].position.x)
+    #                                 self.vis_meas_list.append(obj[1].position.y - obj[0].position.y)
                                 
     def update_vis_meas(self):
         self.vision_flag = True
@@ -482,8 +482,8 @@ class UWBParticleFilter(Node) :
             if args.poses_save: 
                 self.relative_poses_save()
 
-            if args.images_save:
-                self.plot_particles()
+            # if args.images_save:
+            #     self.plot_particles()
         end = time.time_ns() / (10 ** 9)
         self.computation_time.append(end - start)
         # print(f"pf time: {end - start}")
@@ -519,7 +519,7 @@ def main(args=None):
     filter_timer = filter.create_timer(1/5.0, filter.update_filter)
     # if args.with_model:
     #     uwb_timer = filter.create_timer(1/5.0, filter.update_lstm_uwb)
-    vis_timer = filter.create_timer(1/15.0, filter.update_vision_measurements)
+    # vis_timer = filter.create_timer(1/15.0, filter.update_vision_measurements)
 
     # pose_pub_timer = filter.create_timer(1/6.0, filter.pose_pub)
     try:
@@ -535,7 +535,7 @@ def main(args=None):
     finally:
         rclpy.shutdown()
         filter.destroy_timer(filter_timer)
-        filter.destroy_timer(vis_timer)
+        # filter.destroy_timer(vis_timer)
         # filter.destroy_timer(uwb_timer)
         # filter.destroy_timer(pose_pub_timer)
         filter.destroy_node()   
