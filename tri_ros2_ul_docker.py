@@ -114,9 +114,9 @@ class UWBTriangulation(Node) :
 
 
         self.node.get_logger().info("Subscribing to topics")
-        # subscribe to uwb ranges 
+        # subscribe to uwb ranges   topic:  corrected_
         self.uwb_subs = [
-            self.node.create_subscription(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
+            self.node.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
             self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.node.get_logger().info("{} UWB ranges received!".format(len(self.uwb_ranges)))
 
@@ -187,7 +187,7 @@ class UWBTriangulation(Node) :
     def update_lstm_uwb(self):
         self.uwb_inputs = self.cal_lstm_input()
         if self.uwb_inputs.size == 0:
-            self.uwb_lstm_ranges =  [ur - 0.32 for ur in self.uwb_ranges]
+            self.uwb_lstm_ranges =  [ur for ur in self.uwb_ranges]
         else:
             start = time.time_ns()
             print(self.uwb_inputs.shape)
@@ -410,7 +410,7 @@ class UWBTriangulation(Node) :
             print('///////////// using lstm model ////////////////')
             uwb_ranges = copy.deepcopy(self.uwb_lstm_ranges)
         else:
-            uwb_ranges = [ur - 0.32 for ur in self.uwb_ranges]
+            uwb_ranges = [ur for ur in self.uwb_ranges]
 
         positions = [np.zeros(2) for _ in range(num_turtles)] 
         # positions[0] = np.array([0, 0])

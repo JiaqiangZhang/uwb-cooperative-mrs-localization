@@ -1,5 +1,6 @@
 ARG ROS_DISTRO=galactic
 FROM ros:${ROS_DISTRO}
+# docker pull ros:galactic-ros-core
 # -ros-base
 # shaderobotics/yolov5:${ROS_DISTRO}
 # The ARG using before FROM only works on FROM. Define a new ENV or ARG after FROM.
