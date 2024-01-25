@@ -105,7 +105,7 @@ class UWBTriangulation(Node) :
         self.pos_estimation         = []
         self.computation_time       = []
         
-        self.model                  =  keras.models.load_model('./models/lstm_uwb_0')
+        # self.model                  =  keras.models.load_model('./models/lstm_uwb_0')
         self.lstm_input             = []
         self.n_steps                = 10 # 30
         self.uwb_lstm_ranges        = []
@@ -547,7 +547,7 @@ class UWBTriangulation(Node) :
         # rospy_check_rate = self.node.create_rate(10)
         # self.tof_timer = rospy.Timer(rclpy.Duration(0.2), self.calculate_relative_poses)
         self.tof_timer = self.node.create_timer(1/5.0, self.calculate_relative_poses)
-        self.uwb_timer = self.node.create_timer(1/6.0, self.update_lstm_uwb)
+        # self.uwb_timer = self.node.create_timer(1/6.0, self.update_lstm_uwb)
         self.node.get_logger().info("Starting ToF Position Calculations...")
 
         try:
