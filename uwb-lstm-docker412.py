@@ -21,13 +21,14 @@ from tensorflow                 import keras
 from utlis                      import utils
 
 # ???? ["4", "7", "1", "2", "3", "5"]
-turtles         = ["4", "1", "2"  , "3", "5"] # need to use this for mocap, otherwise will out of index
-uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
-uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
+turtles         = ["4", "1", "2"  , "3", "5"]
+# uwbs            = ["4", "1", "2"  , "3", "5"]
+# uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
+# uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
 
 # turtles         = ["4", "1", "2"  ]
-# uwb_pair        = [(4,1), (4,2)]
-# uwb_turtles     = [(0,1), (0,2)]
+uwb_pair        = [(4,1), (4,2)]
+uwb_turtles     = [(0,1), (0,2)]
 
 
 # turtles         = ["4", "3", "5"  ]
@@ -120,7 +121,6 @@ class UWBLSTMRangeCorrection(Node):
         return lambda pos : self.mocap_pose_cb(i, pos)
         
     def mocap_pose_cb(self, i, pos):
-        # print("i, len, mocap_pose_cb", i, len(self.turtles_mocaps), self.turtles_mocaps)
         self.turtles_mocaps[i] = np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.orientation.x, pos.pose.orientation.y, pos.pose.orientation.z, pos.pose.orientation.w])  
         # true_relative_pos = pos
         # true_relative_pos.header.stamp = self.get_clock().now().to_msg()
@@ -139,13 +139,8 @@ class UWBLSTMRangeCorrection(Node):
         # self.uwb_inputs = self.cal_lstm_input()
         if args.with_model:
             # print(self.uwb_ranges[i])
-            # print("uwb_turtles[i][0], uwb_turtles[i][0]", uwb_turtles[i][0], uwb_turtles[i][1])
             node1_mocap = self.turtles_mocaps[uwb_turtles[i][0]] 
-            # print("1i", i)
-            # print("uwb_turtle", uwb_turtles[i][1])
             node2_mocap = self.turtles_mocaps[uwb_turtles[i][1]]
-            # print("2i", i)
-            # print("turtle_mocap", self.turtles_mocaps)
             node1_yaws = utils.euler_from_quaternion(np.array([node1_mocap[2], node1_mocap[3], node1_mocap[4],node1_mocap[5]]))
             node2_yaws = utils.euler_from_quaternion(np.array([node2_mocap[2], node2_mocap[3], node2_mocap[4],node2_mocap[5]]))
             self.lstm_inputs[i].append([self.uwb_ranges[i], node1_yaws, node2_yaws])
