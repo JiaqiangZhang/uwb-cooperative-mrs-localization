@@ -156,7 +156,7 @@ class UWBLSTMRangeCorrection(Node):
                 self.uwb_ranges[i] = self.uwb_ranges[i] - bia[0][0]
                 # print("-bia self.uwb_ranges[i]", self.uwb_ranges[i], i)
             else:
-                self.uwb_ranges[i] = self.uwb_ranges[i] - 0.32
+                self.uwb_ranges[i] = self.uwb_ranges[i]
         else:
             self.uwb_ranges[i] = self.uwb_ranges[i]
 
