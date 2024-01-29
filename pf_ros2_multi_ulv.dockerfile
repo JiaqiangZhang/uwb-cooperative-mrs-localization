@@ -1,5 +1,5 @@
 ARG ROS_DISTRO=galactic
-FROM ros:${ROS_DISTRO}
+FROM ros:${ROS_DISTRO}-ros-core
 # docker pull ros:galactic-ros-core
 # -ros-base
 # shaderobotics/yolov5:${ROS_DISTRO}
@@ -13,11 +13,9 @@ COPY requirements_pf.txt /app
 COPY pf_ros2_multi_ulv.py /app
 COPY utlis /app/utlis
 
-RUN mkdir -p /app/models && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3-pip \
-        git \
         python-dateutil && \
     rm -rf /var/lib/apt/lists/*  && \
     python3 -m pip install --no-cache-dir -r requirements_pf.txt && \

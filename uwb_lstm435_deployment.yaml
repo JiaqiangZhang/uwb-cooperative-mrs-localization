@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: uwb-lstm-deployment
   labels:
-    app: uwb-lstm-deployment123
+    app: uwb-lstm-deployment435
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment123
+      app: uwb-lstm-deployment435
   replicas: 1
   template:
     metadata:
       labels:
-        app: uwb-lstm123
+        app: uwb-lstm435
     spec:
       hostNetwork: true
       # tolerations:
@@ -25,8 +25,8 @@ spec:
       #     operator: Exists
       #     tolerationSeconds: 2
       containers:
-        - name: uwb_lstm123
-          image: 192.168.193.113:5000/uwb_lstm_ros2core:123
+        - name: uwb_lstm435
+          image: 192.168.193.113:5000/uwb_lstm_ros2core:435
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 

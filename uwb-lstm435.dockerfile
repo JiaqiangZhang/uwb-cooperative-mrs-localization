@@ -1,5 +1,5 @@
 ARG ROS_DISTRO=galactic
-FROM ros:${ROS_DISTRO}
+FROM ros:${ROS_DISTRO}-ros-core
 # docker pull ros:galactic-ros-core
 # -ros-base
 # shaderobotics/yolov5:${ROS_DISTRO}
