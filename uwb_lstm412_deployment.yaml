@@ -26,7 +26,7 @@ spec:
       #     tolerationSeconds: 2
       containers:
         - name: uwb_lstm412
-          image: 192.168.193.113:5000/uwb_lstm_ros2core:412
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:412
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
