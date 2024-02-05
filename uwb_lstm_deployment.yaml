@@ -7,7 +7,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment123
+      app: uwb-lstm123
   replicas: 1
   template:
     metadata:
@@ -42,7 +42,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment235
+      app: uwb-lstm235
   replicas: 1
   template:
     metadata:
@@ -78,7 +78,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment412
+      app: uwb-lstm412
   replicas: 1
   template:
     metadata:
@@ -113,7 +113,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment435
+      app: uwb-lstm435
   replicas: 1
   template:
     metadata:
@@ -148,7 +148,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm-deployment1235
+      app: uwb-lstm1235
   replicas: 1
   template:
     metadata:
