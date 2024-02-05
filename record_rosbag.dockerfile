@@ -11,10 +11,10 @@ WORKDIR /app
 
 # COPY rosbag/rosbag2_20_09_08 /app/rosbag/rosbag2_20_09_08
 
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#         ros-${ROS_DISTRO}-rosbag2 &&\
-#     rm -rf /var/lib/apt/lists/* 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ros-${ROS_DISTRO}-rosbag2 &&\
+    rm -rf /var/lib/apt/lists/* 
 
 
-# CMD ["ros2", "bag", "record", "/app/rosbag/rosbag2_20_09_08"]
+CMD ["ros2", "bag", "record", "-o", "k3d_result" "-a"]
