@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: pf-ros2-multi
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
