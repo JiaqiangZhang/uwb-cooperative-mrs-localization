@@ -17,4 +17,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* 
 
 
-CMD ["ros2", "bag", "record", "-o", "k3d_result" "-a"]
+# CMD ["ros2", "bag", "record", "-o", "k3d_result" "-a"]

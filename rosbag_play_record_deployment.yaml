@@ -26,7 +26,7 @@ spec:
       #     tolerationSeconds: 2
       containers:
         - name: play-rosbag-container
-          image: 192.168.193.113:5000/play_rosbag:rosbag2_20_09_08
+          image: 192.168.193.113:5000/play_rosbag:rosbag2_20_09_08_needexec
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
@@ -61,7 +61,7 @@ spec:
       #     tolerationSeconds: 2
       containers:
         - name: record-rosbag-container
-          image: 192.168.193.113:5000/record_rosbag:k3d_result_test
+          image: 192.168.193.113:5000/record_rosbag:k3d_result
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 

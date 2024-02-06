@@ -17,4 +17,4 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* 
 
 
-CMD ["ros2", "bag", "play", "/app/rosbag/rosbag2_20_09_08"]
+# CMD ["ros2", "bag", "play", "/app/rosbag/rosbag2_20_09_08"]
