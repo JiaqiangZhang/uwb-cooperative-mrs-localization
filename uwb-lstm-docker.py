@@ -94,7 +94,7 @@ class UWBLSTMRangeCorrection(Node):
         if args.with_model:
             self.models                 = [keras.models.load_model('./models/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
             self.lstm_inputs            = [[] for _ in uwb_pair]
-            self.n_steps                = 10
+            self.n_steps                = 30
             self.uwb_lstm_ranges        = []
             self.uwb_real               = []
             self.uwb_inputs             = []
