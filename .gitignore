@@ -1,10 +1,9 @@
-/rosbag/rosbag2_20_06_59
-/rosbag/rosbag2_20_09_08
-/rosbag/result/k3d_result
-/rosbag/rosbag2_20_06_59.zip
-/rosbag/rosbag2_20_09_08.zip
+# /rosbag/rosbag2_20_06_59
+# /rosbag/rosbag2_20_09_08
+# /rosbag/result/k3d_result
+# /rosbag/rosbag2_20_06_59.zip
+# /rosbag/rosbag2_20_09_08.zip
 script/errors/__pycache__*
-results
 ape
 
 
