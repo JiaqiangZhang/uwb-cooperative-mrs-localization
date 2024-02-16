@@ -26,7 +26,8 @@ spec:
       #     tolerationSeconds: 2
       containers:
         - name: pf-ros2
-          image: 192.168.193.113:5000/pf_ros2_multi_ulv:ros2core
+          # image: 192.168.193.113:5000/pf_ros2_multi_ulv:ros2core
+          image: 192.168.193.113:5000/pf_ros2_multi_ulv:ros2core_nolstm
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
