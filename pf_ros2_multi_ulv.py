@@ -204,7 +204,7 @@ class UWBParticleFilter(Node) :
             else:
                 self.uwb_ranges[i] = self.uwb_ranges[i] - 0.32
         else:
-            self.uwb_ranges[i] = self.uwb_ranges[i] - 0.32
+            self.uwb_ranges[i] = self.uwb_ranges[i]
 
     def create_mocap_pose_cb(self, i):
         return lambda pos : self.mocap_pose_cb(i, pos)
