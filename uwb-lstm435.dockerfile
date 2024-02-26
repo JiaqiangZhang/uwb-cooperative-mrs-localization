@@ -30,8 +30,8 @@ RUN mkdir -p /app/models && \
 #              /app/results/results_csv/triangulation/pos/pos_tri \
 #              /app/models
 # COPY lstm_uwb_0 /app/models/lstm_uwb_0
-COPY models/lstm_uwb_4_3 /app/models/lstm_uwb_4_3
-COPY models/lstm_uwb_4_5 /app/models/lstm_uwb_4_5
+COPY models/previous/lstm_uwb_4_3 /app/models/lstm_uwb_4_3
+COPY models/previous/lstm_uwb_4_5 /app/models/lstm_uwb_4_5
 
 CMD ["python3", "/app/uwb-lstm-docker435.py"]
 
