@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from itertools import chain
+import pandas as pd
 
 from utlis import utils
 from pfilter import ParticleFilter, squared_error, gaussian_noise
@@ -10,10 +11,10 @@ from tensorflow import keras
 import matplotlib.pyplot as plt
 
 class UWBParticleFilter():
-    def __init__(self, spatial_enable = False, lstm_enable = False, identical_thresh = 0.1, robot_ids = [0,1,2]):
-        self.init_roi = (-8, 8)
+    def __init__(self, spatial_enable = False, lstm_enable = False, model_paths={}, identical_thresh = 0.10, robot_ids = [0,1,2]):
+        self.init_roi = (-2, 2)
         self.num_particles = 100
-        self.num_states = len(robot_ids) * 2
+        self.num_states = (len(robot_ids)-1) * 2
         self.esti_noise = 0.05
         self.weights_sigma = 1.2
         self.resample_proportion = 0.1
@@ -32,6 +33,8 @@ class UWBParticleFilter():
         self.odom_trans = []
         self.odom_trans_prev = []
 
+        self.robot_pose = {}
+
         self.odom_save = []
 
         if self.spatial_enable:
@@ -41,6 +44,9 @@ class UWBParticleFilter():
             self.lstm_steps = 30
             self.lstm_input_dict = {}
             self.models = {}
+            # self.model_paths = model_paths
+                    # if self.lstm_enable:
+            self.set_lstm_models(model_paths)
 
     '''
         Initialize particle filter
@@ -48,6 +54,13 @@ class UWBParticleFilter():
     def pf_filter_init(self):
 
         self.prior_fn = lambda n:np.random.uniform(self.init_roi[0],self.init_roi[1], (n, self.num_states))
+        self.prior_init = []
+        for inx in self.robot_ids:
+            if inx > 0:
+                self.prior_init.append(self.odom_data[inx][0]- self.odom_data[0][0]) 
+                self.prior_init.append(self.odom_data[inx][1]- self.odom_data[0][1]) # = self.odom_data[1:, 0:2]- np.array([self.odom_data[0][0], self.odom_data[0][1]])
+        
+        self.prior_fn = lambda n: np.array(self.prior_init).flatten() + np.random.normal(0,0.2,(n,self.num_states)) #np.random.uniform(-8,8,(n,8))+self.odoms_init
 
         self.pf = ParticleFilter(
             prior_fn =              self.prior_fn, 
@@ -60,6 +73,8 @@ class UWBParticleFilter():
         )
 
         self.pf.init_filter()
+
+
         self.pf_init_flag = True
 
     '''
@@ -81,16 +96,23 @@ class UWBParticleFilter():
         # print(f"particles shape: {x.shape}")
         tmp = []
         for p in self.uwb_dict:
-            tmp.append(x[:,2*p[1]:2*p[1]+2] - x[:,2*p[0]:2*p[0]+2])
+            # print(f"p:{p}")
+            if(p[0] == 0):
+                key_y = p[1]-1 
+                tmp.append(x[:,2*key_y:2*key_y+2])
+            else:
+                key_x, key_y = p[0] -1, p[1]-1
+                tmp.append(x[:,2*key_y:2*key_y+2] - x[:,2*key_x:2*key_x+2])
+        # sprint(f"tmp shape: {tmp.shape}")
         hypo = np.linalg.norm(tmp, axis=2)
-        print(hypo)
-        if self.spatial_enable:
-            for key in self.cooperative_spatial_dict:
-                sp0 = self.cooperative_spatial_dict[key] - x[:,0:2]
-                sp1 = self.cooperative_spatial_dict[key] - x[:,0:2]
-                rp = sp1 - sp0
-                hypo.append(rp[:,0])
-                hypo.append(rp[:,1])
+        # print(hypo)
+        # if self.spatial_enable:
+        #     for key in self.cooperative_spatial_dict:
+        #         sp0 = self.cooperative_spatial_dict[key] - x[:,2*key[0]:2*key[0]+2]
+        #         sp1 = self.cooperative_spatial_dict[key] - x[:,2*key[1]:2*key[1]+2]
+        #         rp = sp1 - sp0
+        #         hypo.append(rp[:,0])
+        #         hypo.append(rp[:,1])
         # print(f"hypo: {hypo.shape}")
         return np.transpose(hypo) 
 
@@ -108,8 +130,8 @@ class UWBParticleFilter():
         # set the the first robot as the origin
         origin = (self.odom_data[self.robot_ids[0]][0], self.odom_data[self.robot_ids[0]][1])
         self.odom_trans = list(chain.from_iterable([[val[0] - origin[0],val[1] - origin[1]] for val in self.odom_data.values()]))
-        self.odom_save.append(self.odom_trans)
-        # self.odom_trans =  self.odom_trans[2:]
+        # self.odom_save.append(self.odom_trans)
+        self.odom_trans =  self.odom_trans[2:]
         # print(len(self.odom_trans))
         if not self.odom_trans_prev:
             self.odom_trans_prev = self.odom_trans
@@ -118,9 +140,12 @@ class UWBParticleFilter():
         self.odom_data_prev = self.odom_trans
 
     def update_robots_poses(self):
-        # for id in self.robot_ids:
-        #     self.robot_poses.append([self.pf.mean_state[2*id], self.pf.mean_state[2*id+1]])
-        print(self.pf.mean_state)
+        for id in self.robot_ids:
+            if id==0:
+                self.robot_pose[id] = [0,0]
+            else:
+                self.robot_pose[id] = [self.pf.mean_state[2*(id-1)], self.pf.mean_state[2*(id-1)+1]]
+        # print(self.pf.mean_state)
         self.robot_poses.append(self.pf.mean_state)
 
     def update_input(self, uwb_data, odom_data):
@@ -138,28 +163,42 @@ class UWBParticleFilter():
     def identical_detection(self, det, p):
         dp0 = det - p[0]
         dp1 = det - p[1]
+        print(f"det: {det}")
+        print(f"p[0]:{p[0]}")
+        print(f"p[1]:{p[1]}")
+        print(f"real: {np.linalg.norm(dp1 - dp0)} and thresh:{self.identical_thresh}")
         return np.linalg.norm(dp1 - dp0) < self.identical_thresh
     
 
     # loop all the detections and robot pairs to check if there is identical detection, if yes, add to the spatial_dict
-    def detection_iterate(self, dets, rpairs, poses, thresh, spatial_dict):
-        for det in dets:
-            for p in rpairs:
-                if self.identical_detection(det, poses[p[0]], poses[p[1]], thresh):
-                    return spatial_dict[p].append(det)
+    # def detection_iterate(self, dets, rpairs, poses, thresh, spatial_dict):
+    #     for det in dets:
+    #         for p in rpairs:
+    #             if self.identical_detection(det, poses[p[0]], poses[p[1]], thresh):
+    #                 return spatial_dict[p].append(det)
 
     # loop all the detections and robot pairs to check if there is identical detection, if yes, add to the spatial_dict
     def detection_iterate(self, robot_ids, spatial_dict):
+        print(f"deteciton >>>>")
+        print(spatial_dict)
         for id in spatial_dict:
+            # print(f"id:{id}")
             if len(spatial_dict[id]) > 0:
                 for det in spatial_dict[id]:
+                    # print(det)
                     for p in robot_ids:
+                        # print(f"p:{p}")
                         if p != id:
-                            if self.identical_detection(det, (self.robot_poses[id], self.robot_poses[p])):
+                            # print(self.robot_pose)
+                            if self.identical_detection(det[0:2], (self.robot_pose[id], self.robot_pose[p])):
                                 self.cooperative_spatial_dict[(id, p)].append(det)
+                                self.counter = self.counter + 1
+                                print("cooperative detection in total: {}".format(self.counter))
+        print(f"deteciton <<<<")
 
-    def set_lstm_modes(self, model_paths):
-        for key in self.uwb_dict:
+    def set_lstm_models(self, model_paths):
+        for key in model_paths:
+            print(key)
             self.models[key] = keras.models.load_model(model_paths[key])
 
     def set_lstm_input(self):
@@ -177,13 +216,13 @@ class UWBParticleFilter():
         observation = [] 
         for key in self.uwb_dict:
             observation.append(self.uwb_dict[key])
-        if self.spatial_enable:
-            for key in self.cooperative_spatial_dict:
-                sp0 = self.cooperative_spatial_dict[key] - self.robot_poses[key[0]]
-                sp1 = self.cooperative_spatial_dict[key] - self.robot_poses[key[1]]
-                rp = sp1 - sp0
-                observation.append(rp[0])
-                observation.append(rp[1])
+        # if self.spatial_enable:
+        #     for key in self.cooperative_spatial_dict:
+        #         sp0 = self.cooperative_spatial_dict[key] - self.robot_poses[key[0]]
+        #         sp1 = self.cooperative_spatial_dict[key] - self.robot_poses[key[1]]
+        #         rp = sp1 - sp0
+        #         observation.append(rp[0])
+        #         observation.append(rp[1])
         return observation
 
     def get_robot_poses(self):
@@ -244,6 +283,43 @@ class UWBParticleFilter():
             print(">>>> updated filter")
             self.update_robots_poses()
             self.first_iter_flag = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # if __name__ == "__main__":

@@ -27,12 +27,12 @@ from utlis                      import utils
 fake_odom       = True
 # with_polyfit    = True
 fuse_name       = ["u", "uv"]
-turtles         = ["4", "1", "2"  , "3", "5"]
+turtles         = ["0", "1", "2"  , "3", "4"]
 spatial_pair    = list(itertools.combinations(turtles,2))
 # print(spatial_pair)
 # [('4', '1'), ('4', '2'), ('4', '3'), ('4', '5'), ('1', '2'), ('1', '3'), ('1', '5'), ('2', '3'), ('2', '5'), ('3', '5')]
-uwbs            = ["4", "1", "2"  , "3", "5"]
-uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
+uwbs            = ["0", "1", "2"  , "3", "4"]
+uwb_pair        = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
 spatial_uwb     = {spatial_pair[i]: i for i in range(len(uwb_pair))}
 spatial_dict    = {sp:[] for sp in spatial_pair}
 uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
