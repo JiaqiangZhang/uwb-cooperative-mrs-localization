@@ -10,7 +10,7 @@ ENV ROS_DISTRO galactic
 WORKDIR /app
 
 COPY requirements_lstm.txt /app
-COPY uwb-lstm-docker435.py /app
+COPY uwb-lstm-docker012.py /app
 COPY utlis /app/utlis
 
 RUN mkdir -p /app/models && \
@@ -30,10 +30,10 @@ RUN mkdir -p /app/models && \
 #              /app/results/results_csv/triangulation/pos/pos_tri \
 #              /app/models
 # COPY lstm_uwb_0 /app/models/lstm_uwb_0
-COPY models/previous/lstm_uwb_4_3 /app/models/lstm_uwb_4_3
-COPY models/previous/lstm_uwb_4_5 /app/models/lstm_uwb_4_5
+COPY models/normal_tagID/lstm_uwb_0_1 /app/models/lstm_uwb_0_1
+COPY models/normal_tagID/lstm_uwb_0_2 /app/models/lstm_uwb_0_2
 
-CMD ["python3", "/app/uwb-lstm-docker435.py"]
+CMD ["python3", "/app/uwb-lstm-docker012.py"]
 
 ####### , "--with_model", "False", "--poses_save", "--computation_save"
 

@@ -20,7 +20,7 @@ from nav_msgs.msg               import Odometry
 
 from pfilter                    import ParticleFilter, squared_error
 
-# from tensorflow                 import keras
+from tensorflow                 import keras
 
 from utlis                      import utils
 
@@ -136,19 +136,19 @@ class UWBParticleFilter(Node) :
         self.sp_temp                = []
         self.computation_time       = []
         self.poly_coefficient       = [ 2.30932370e-13,  1.03347377e-11, -9.03676014e-08,  2.61712111e-05,  -2.07631167e-03,  2.15006000e-01]
-        # if args.with_model:
-        #     self.models                 = [keras.models.load_model('/home/xianjia/Workspace/temp/lstm_ws/lstm_uwb_{}'.format(inx)) for inx in range(len(uwb_pair))]
-        #     self.lstm_inputs            = [[] for _ in uwb_pair]
-        #     self.n_steps                = 30
-        #     self.uwb_lstm_ranges        = []
-        #     self.uwb_real               = []
-        #     self.uwb_inputs             = []
-        #     time.sleep(1.0)
+        if args.with_model:
+            self.models                 = [keras.models.load_model('./models/previous/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
+            self.lstm_inputs            = [[] for _ in uwb_pair]
+            self.n_steps                = 30
+            self.uwb_lstm_ranges        = []
+            self.uwb_real               = []
+            self.uwb_inputs             = []
+            time.sleep(1.0)
 
         self.get_logger().info("Subscribing to topics......")
-        # subscribe to uwb ranges 
+        # subscribe to uwb ranges corrected_
         self.uwb_subs = [
-            self.create_subscription(Range, "/corrected_uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
+            self.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
             self.create_uwb_ranges_cb(i),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
         self.get_logger().info("{} UWB ranges subscribed!".format(len(self.uwb_ranges)))
 
@@ -200,9 +200,9 @@ class UWBParticleFilter(Node) :
             if len(self.lstm_inputs[i]) > self.n_steps:
                 lstm_input_arr = np.array(self.lstm_inputs[i][-self.n_steps:])
                 bia = self.models[i].predict(np.reshape(lstm_input_arr,(1, self.n_steps, 3)), verbose = 0)
-                self.uwb_ranges[i] = self.uwb_ranges[i] - bia[0]
+                self.uwb_ranges[i] = self.uwb_ranges[i] - bia[0][0]
             else:
-                self.uwb_ranges[i] = self.uwb_ranges[i] - 0.32
+                self.uwb_ranges[i] = self.uwb_ranges[i]
         else:
             self.uwb_ranges[i] = self.uwb_ranges[i]
 

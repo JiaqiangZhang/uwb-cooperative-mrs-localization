@@ -2,11 +2,11 @@
 # Common python libaries
 import os 
 import time
-# import math
+import math
 import argparse
 import numpy                    as np
-# import itertools
-# import copy
+import itertools
+import copy
 
 # ROS libaries
 import rclpy
@@ -21,7 +21,8 @@ from tensorflow                 import keras
 from utlis                      import utils
 
 # ???? ["4", "7", "1", "2", "3", "5"]
-turtles         = ["4", "1", "2"  , "3", "5"]
+# turtles         = ["4", "1", "2"  , "3", "5"]
+turtles = ["0", "1", "2", "3", "4"]
 # uwbs            = ["4", "1", "2"  , "3", "5"]
 # uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
 # uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
@@ -32,8 +33,8 @@ turtles         = ["4", "1", "2"  , "3", "5"]
 
 
 # turtles         = ["4", "3", "5"  ]
-uwb_pair        = [(4,3), (4,5)]
-uwb_turtles     = [(0,3), (0,4)]
+# uwb_pair        = [(4,3), (4,5)]
+# uwb_turtles     = [(0,3), (0,4)]
 
 
 # turtles         = ["1", "2", "3"  ]
@@ -48,8 +49,8 @@ uwb_turtles     = [(0,3), (0,4)]
 
 
 # turtles         = ["2", "3", "5"]
-# uwb_pair        = [(2,5), (3,5)]
-# uwb_turtles     = [(2,4), (3,4)]
+uwb_pair        = [(2,4), (3,4)] #[(2,5), (3,5)]
+uwb_turtles     = [(2,4), (3,4)]
 
 
 # turtles         = ["4", "7", "1", "2", "3", "5"]
@@ -93,7 +94,7 @@ class UWBLSTMRangeCorrection(Node):
         self.turtles_mocaps         = [np.zeros(len(turtles)*2) for _ in turtles]
   
         if args.with_model:
-            self.models                 = [keras.models.load_model('./models/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
+            self.models                 = [keras.models.load_model('./models/normal_tagID/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
             self.lstm_inputs            = [[] for _ in uwb_pair]
             self.n_steps                = 30
             self.uwb_lstm_ranges        = []

@@ -20,8 +20,11 @@ from tensorflow                 import keras
 
 from utlis                      import utils
 
+turtles = ["0", "1", "2", "3", "4"]
+# uwb_pair  = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
+
 # ???? ["4", "7", "1", "2", "3", "5"]
-turtles         = ["4", "1", "2"  , "3", "5"] # need to use this for mocap, otherwise will out of index
+# turtles         = ["4", "1", "2"  , "3", "5"] # need to use this for mocap, otherwise will out of index
 # uwb_pair        = [(4,1), (4,2), (4,3), (4,5), (1,2), (1,3), (1,5), (2,3), (2,5), (3,5)]
 # uwb_turtles     = [(0,1), (0,2), (0,3), (0,4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]
 
@@ -32,7 +35,7 @@ turtles         = ["4", "1", "2"  , "3", "5"] # need to use this for mocap, othe
 
 # turtles         = ["4", "3", "5"  ]
 # uwb_pair        = [(4,3), (4,5)]
-# uwb_turtles     = [(0,3), (0,4)]
+# uwb_turtles     = [(0,3), (0,4)]corrected_uwb = range
 
 
 # turtles         = ["1", "2", "3"  ]
@@ -87,12 +90,12 @@ class UWBLSTMRangeCorrection(Node):
         )
    
 
-        # all varibles 
+        # all varibles step30/
         self.uwb_ranges             = [0.0 for _ in uwb_pair]
         self.turtles_mocaps         = [np.zeros(len(turtles)*2) for _ in turtles]
   
         if args.with_model:
-            self.models                 = [keras.models.load_model('./models/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
+            self.models                 = [keras.models.load_model('./models/normal_tagID/lstm_uwb_{}_{}'.format(p[0],p[1])) for p in uwb_pair]
             self.lstm_inputs            = [[] for _ in uwb_pair]
             self.n_steps                = 30
             self.uwb_lstm_ranges        = []
@@ -162,6 +165,7 @@ class UWBLSTMRangeCorrection(Node):
 
         # print("after self.uwb_ranges[i]", self.uwb_ranges[i], i)
         corrected_uwb = range
+        # print("class")
         corrected_uwb.range = self.uwb_ranges[i]
         # print("corrected_uwb.range", corrected_uwb.range)
         corrected_uwb.header.stamp = self.get_clock().now().to_msg()
