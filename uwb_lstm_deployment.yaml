@@ -36,18 +36,18 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uwb-lstm-deployment235
+  name: uwb-lstm-deployment234
   labels:
-    app: uwb-lstm235
+    app: uwb-lstm234
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm235
+      app: uwb-lstm234
   replicas: 1
   template:
     metadata:
       labels:
-        app: uwb-lstm235
+        app: uwb-lstm234
     spec:
       # hostNetwork: true
       # tolerations:
@@ -60,8 +60,8 @@ spec:
       #     operator: Exists
       #     tolerationSeconds: 2
       containers:
-        - name: uwb-lstm-ros2core-235
-          image: 192.168.193.113:5000/uwb-lstm-ros2core:235
+        - name: uwb-lstm-ros2core-234
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:234
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
@@ -72,18 +72,18 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uwb-lstm-deployment412
+  name: uwb-lstm-deployment012
   labels:
-    app: uwb-lstm412
+    app: uwb-lstm012
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm412
+      app: uwb-lstm012
   replicas: 1
   template:
     metadata:
       labels:
-        app: uwb-lstm412
+        app: uwb-lstm012
     spec:
       # hostNetwork: true
       # tolerations:
@@ -96,8 +96,8 @@ spec:
       #     operator: Exists
       #     tolerationSeconds: 2
       containers:
-        - name: uwb-lstm-ros2core-412
-          image: 192.168.193.113:5000/uwb-lstm-ros2core:412
+        - name: uwb-lstm-ros2core-012
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:012
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
@@ -107,18 +107,18 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uwb-lstm-deployment435
+  name: uwb-lstm-deployment034
   labels:
-    app: uwb-lstm435
+    app: uwb-lstm034
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm435
+      app: uwb-lstm034
   replicas: 1
   template:
     metadata:
       labels:
-        app: uwb-lstm435
+        app: uwb-lstm034
     spec:
       # hostNetwork: true
       # tolerations:
@@ -131,8 +131,8 @@ spec:
       #     operator: Exists
       #     tolerationSeconds: 2
       containers:
-        - name: uwb-lstm-ros2core-435
-          image: 192.168.193.113:5000/uwb-lstm-ros2core:435
+        - name: uwb-lstm-ros2core-034
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:034
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 
@@ -142,18 +142,18 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uwb-lstm-deployment1235
+  name: uwb-lstm-deployment1234
   labels:
-    app: uwb-lstm1235
+    app: uwb-lstm1234
 spec:
   selector:
     matchLabels:
-      app: uwb-lstm1235
+      app: uwb-lstm1234
   replicas: 1
   template:
     metadata:
       labels:
-        app: uwb-lstm1235
+        app: uwb-lstm1234
     spec:
       # hostNetwork: true
       # tolerations:
@@ -166,8 +166,8 @@ spec:
       #     operator: Exists
       #     tolerationSeconds: 2
       containers:
-        - name: uwb-lstm-ros2core-1235
-          image: 192.168.193.113:5000/uwb-lstm-ros2core:1235
+        - name: uwb-lstm-ros2core-1234
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:1234
           # yolov5_ros2:galactic-latest hello-world
           # command: ["/bin/bash", "-c"]
           # args: 

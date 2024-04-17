@@ -5,7 +5,7 @@ import time
 import math
 import argparse
 import numpy                    as np
-import matplotlib.pyplot        as plt
+# import matplotlib.pyplot        as plt
 import itertools
 import copy
 # ROS libaries
@@ -52,7 +52,7 @@ class UWBRelativePositionNode(Node) :
         self.pose_estimations = []
 
         self.get_logger().info("Subscribing to topics......")
-        # subscribe to uwb ranges 
+        # subscribe to uwb ranges corrected_
         self.uwb_subs = [
             self.create_subscription(Range, "/uwb/tof/n_{}/n_{}/distance".format(p[0], p[1]), 
             self.create_uwb_ranges_cb(p),qos_profile=self.qos) for i, p in enumerate(uwb_pair)]
