@@ -1,0 +1,174 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uwb-lstm-deployment123
+  labels:
+    app: uwb-lstm123
+spec:
+  selector:
+    matchLabels:
+      app: uwb-lstm123
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uwb-lstm123
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: uwb-lstm-ros2core-123
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:123
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uwb-lstm-deployment234
+  labels:
+    app: uwb-lstm234
+spec:
+  selector:
+    matchLabels:
+      app: uwb-lstm234
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uwb-lstm234
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: uwb-lstm-ros2core-234
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:234
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uwb-lstm-deployment012
+  labels:
+    app: uwb-lstm012
+spec:
+  selector:
+    matchLabels:
+      app: uwb-lstm012
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uwb-lstm012
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: uwb-lstm-ros2core-012
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:012
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uwb-lstm-deployment034
+  labels:
+    app: uwb-lstm034
+spec:
+  selector:
+    matchLabels:
+      app: uwb-lstm034
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uwb-lstm034
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: uwb-lstm-ros2core-034
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:034
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uwb-lstm-deployment1234
+  labels:
+    app: uwb-lstm1234
+spec:
+  selector:
+    matchLabels:
+      app: uwb-lstm1234
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uwb-lstm1234
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: uwb-lstm-ros2core-1234
+          image: 192.168.193.113:5000/uwb-lstm-ros2core:1234
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]

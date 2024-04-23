@@ -97,9 +97,9 @@ class UWBTriangulation(Node) :
         self.pos_estimation         = []
         self.computation_time       = []
         
-        self.model                  =  keras.models.load_model('/home/xianjia/Workspace/temp/lstm_ws/lstm_uwb')
+        self.model                  =  keras.models.load_model('/home/jqzhang/FILES/Research/R3Swarms/uwb-nn-estimation/models/lstm_uwb_0')
         self.lstm_input             = []
-        self.n_steps                = 30
+        self.n_steps                = 10 # 30
         self.uwb_lstm_ranges        = []
         self.uwb_real               = []
         self.uwb_inputs             = []

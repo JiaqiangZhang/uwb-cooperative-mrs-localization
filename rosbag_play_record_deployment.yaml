@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: play-rosbag-deployment
+  labels:
+    app: play-rosbag
+spec:
+  selector:
+    matchLabels:
+      app: play-rosbag
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: play-rosbag
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: play-rosbag-container
+          image: 192.168.193.113:5000/play_rosbag:rosbag2_20_09_08_needexec
+          # yolov5_ros2:galactic-latest hello-world
+          command: ["/bin/bash", "-ce", "tail -f /dev/null"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: record-rosbag-deployment
+  labels:
+    app: record-rosbag
+spec:
+  selector:
+    matchLabels:
+      app: record-rosbag
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: record-rosbag
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: record-rosbag-container
+          image: 192.168.193.113:5000/record_rosbag:k3d_result
+          # yolov5_ros2:galactic-latest hello-world
+          command: ["/bin/bash", "-ce", "tail -f /dev/null"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]

@@ -8,7 +8,7 @@ from pfilter import ParticleFilter, squared_error, gaussian_noise
 
 from tensorflow import keras
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 class UWBParticleFilter():
     def __init__(self, spatial_enable = False, lstm_enable = False, model_paths={}, identical_thresh = 0.10, robot_ids = [0,1,2]):
@@ -229,39 +229,39 @@ class UWBParticleFilter():
         return self.robot_poses
     
 
-    def plot_particles(self):
-        """Plot a 1D tracking result as a line graph with overlaid
-        scatterplot of particles. Particles are sized according to
-        normalised weight at each step.
-            x: time values
-            y: original (uncorrupted) values
-            yn: noisy (observed) values
-            states: dictionary return from apply_pfilter        
-        """
+    # def plot_particles(self):
+    #     """Plot a 1D tracking result as a line graph with overlaid
+    #     scatterplot of particles. Particles are sized according to
+    #     normalised weight at each step.
+    #         x: time values
+    #         y: original (uncorrupted) values
+    #         yn: noisy (observed) values
+    #         states: dictionary return from apply_pfilter        
+    #     """
 
-        plt.ioff()
-        plt.clf()
-        print(">>>>>> saving figures")
-        symbols = ['x', 'o', '*', '-',"v"]
-        symbol_colors =['black', 'darkgray', 'lightgray', 'red', 'green']
-        legends = [["T0_G", "T0_Mean", "T0_Map", "T0_Particles"],
-                   ["T1_G", "T1_Mean", "T1_Map", "T1_Particles"],
-                   ["T2_G", "T2_Mean", "T2_Map", "T2_Particles"],
-                   ["T3_G", "T3_Mean", "T3_Map", "T3_Particles"],
-                   ["T4_G", "T4_Mean", "T4_Map", "T4_Particles"]]
-        for i in range(len(self.robot_ids)):
-            print(i)
-            # plt.plot(self.true_relative_poses[i][0], self.true_relative_poses[i][1], symbols[i], c='red', label=legends[i][0])
-            plt.plot(self.pf.mean_state[2*i], self.pf.mean_state[2*i+1], symbols[i], c='green', label=legends[i][1])
-            plt.plot(self.pf.map_state[2*i], self.pf.map_state[2*i+1], symbols[i], c='orange', label=legends[i][2])
-            plt.scatter(self.pf.transformed_particles[:,2*i], self.pf.transformed_particles[:,2*i+1], color=symbol_colors[i], label=legends[i][3]) # lightgray
-        print(f"particles shape:{self.pf.transformed_particles.shape}")
-        plt.xlim(-9,9)
-        plt.ylim(-9,9)
+    #     plt.ioff()
+    #     plt.clf()
+    #     print(">>>>>> saving figures")
+    #     symbols = ['x', 'o', '*', '-',"v"]
+    #     symbol_colors =['black', 'darkgray', 'lightgray', 'red', 'green']
+    #     legends = [["T0_G", "T0_Mean", "T0_Map", "T0_Particles"],
+    #                ["T1_G", "T1_Mean", "T1_Map", "T1_Particles"],
+    #                ["T2_G", "T2_Mean", "T2_Map", "T2_Particles"],
+    #                ["T3_G", "T3_Mean", "T3_Map", "T3_Particles"],
+    #                ["T4_G", "T4_Mean", "T4_Map", "T4_Particles"]]
+    #     for i in range(len(self.robot_ids)):
+    #         print(i)
+    #         # plt.plot(self.true_relative_poses[i][0], self.true_relative_poses[i][1], symbols[i], c='red', label=legends[i][0])
+    #         plt.plot(self.pf.mean_state[2*i], self.pf.mean_state[2*i+1], symbols[i], c='green', label=legends[i][1])
+    #         plt.plot(self.pf.map_state[2*i], self.pf.map_state[2*i+1], symbols[i], c='orange', label=legends[i][2])
+    #         plt.scatter(self.pf.transformed_particles[:,2*i], self.pf.transformed_particles[:,2*i+1], color=symbol_colors[i], label=legends[i][3]) # lightgray
+    #     print(f"particles shape:{self.pf.transformed_particles.shape}")
+    #     plt.xlim(-9,9)
+    #     plt.ylim(-9,9)
 
-        plt.legend()
-        self.counter += 1
-        plt.savefig("/home/xianjia/imgs/test{}.png".format(self.counter))
+    #     plt.legend()
+    #     self.counter += 1
+    #     plt.savefig("/home/xianjia/imgs/test{}.png".format(self.counter))
 
     '''
         Update the particle filter

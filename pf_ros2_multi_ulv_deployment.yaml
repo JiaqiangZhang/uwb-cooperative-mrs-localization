@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pf-ros2-multi-ulv-deployment
+  labels:
+    app: pf-ros2-multi
+spec:
+  selector:
+    matchLabels:
+      app: pf-ros2-multi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pf-ros2-multi
+    spec:
+      # hostNetwork: true
+      # tolerations:
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/unreachable
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      #   - effect: NoExecute
+      #     key: node.kubernetes.io/not-ready
+      #     operator: Exists
+      #     tolerationSeconds: 2
+      containers:
+        - name: pf-ros2
+          # image: 192.168.193.113:5000/pf_ros2_multi_ulv:ros2core_lstm_no032
+          image: 192.168.193.113:5000/pf_ros2_multi_ulv:ros2core_nolstm_no032
+          # yolov5_ros2:galactic-latest hello-world
+          # command: ["/bin/bash", "-c"]
+          # args: 
+          # ["source /opt/ros/galactic/setup.bash && source /app/yolo_ws/install/setup.bash && export ROS_DOMAIN_ID=7 && ros2 run yolov5_ros2 yolo_detect --ros-args -p device:=cpu -p image_topic:=/image_raw -p model:=yolov5s"]
