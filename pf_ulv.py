@@ -5,7 +5,7 @@ from itertools import chain
 from utlis import utils
 from pfilter import ParticleFilter, squared_error, gaussian_noise
 
-from tensorflow import keras
+# from tensorflow import keras
 
 # import matplotlib.pyplot as plt
 
@@ -47,8 +47,14 @@ class UWBParticleFilter():
     '''
     def pf_filter_init(self):
 
-        self.prior_fn = lambda n:np.random.uniform(self.init_roi[0],self.init_roi[1], (n, self.num_states))
+        # self.prior_fn = lambda n:np.random.uniform(self.init_roi[0],self.init_roi[1], (n, self.num_states))
+        self.prior_init = []
+        for inx in self.robot_ids:
+            if inx > 0:
+                self.prior_init.append(self.odom_data[inx][0]- self.odom_data[0][0]) 
+                self.prior_init.append(self.odom_data[inx][1]- self.odom_data[0][1]) # = self.odom_data[1:, 0:2]- np.array([self.odom_data[0][0], self.odom_data[0][1]])
 
+        self.prior_fn = lambda n: np.array(self.prior_init).flatten() + np.random.normal(0,0.2,(n,self.num_states)) #np.random.uniform(-8,8,(n,8))+self.odoms_init
         self.pf = ParticleFilter(
             prior_fn =              self.prior_fn, 
             observe_fn =            self.calc_hypothesis,  
@@ -119,7 +125,8 @@ class UWBParticleFilter():
 
     def update_robots_poses(self):
         # for id in self.robot_ids:
-        #     self.robot_poses.append([self.pf.mean_state[2*id], self.pf.mean_state[2*id+1]])
+        #     print("update pose", self.pf.mean_state)
+            # self.robot_poses.append([self.pf.mean_state[2*id], self.pf.mean_state[2*id+1]])
         print(self.pf.mean_state)
         self.robot_poses.append(self.pf.mean_state)
 
@@ -158,9 +165,9 @@ class UWBParticleFilter():
                             if self.identical_detection(det, (self.robot_poses[id], self.robot_poses[p])):
                                 self.cooperative_spatial_dict[(id, p)].append(det)
 
-    def set_lstm_modes(self, model_paths):
-        for key in self.uwb_dict:
-            self.models[key] = keras.models.load_model(model_paths[key])
+    # def set_lstm_modes(self, model_paths):
+    #     for key in self.uwb_dict:
+    #         self.models[key] = keras.models.load_model(model_paths[key])
 
     def set_lstm_input(self):
         for key in self.uwb_dict:

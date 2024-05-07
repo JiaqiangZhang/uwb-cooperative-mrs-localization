@@ -15,7 +15,7 @@ from rclpy.qos                  import QoSProfile, ReliabilityPolicy, HistoryPol
 from geometry_msgs.msg          import PoseStamped
 from sensor_msgs.msg            import Range
 from nav_msgs.msg               import Odometry
-from depthai_ros_msgs.msg       import SpatialDetectionArray
+# from depthai_ros_msgs.msg       import SpatialDetectionArray
 
 from pfilter                    import ParticleFilter, squared_error
 
@@ -43,11 +43,14 @@ class UWBRelativePositionNode(Node) :
         self.pf_estimator = pf_estimator
         self.uwb_pairs = uwb_pair
         self.robot_ids = robot_ids
+        self.turtles_mocaps         = [np.zeros(6) for _ in self.robot_ids]
         self.uwb_ranges_dict = {p:0.0 for p in self.uwb_pairs}
         self.odom_data_dict = {id:np.array([]) for id in self.robot_ids}
         self.odom_data_aligned_dict = {id:np.array([]) for id in self.robot_ids}
         self.mocap_data_dict = {id:np.array([]) for id in self.robot_ids}
         self.spatial_dict={id:[] for id in self.robot_ids}
+        self.true_relative_poses    = [np.zeros(2) for _ in range(1,len(self.robot_ids))]
+        self.relative_poses         = [np.zeros(2) for _ in range(1,len(self.robot_ids))]
 
         self.pose_estimations = []
 
@@ -71,11 +74,16 @@ class UWBRelativePositionNode(Node) :
         self.get_logger().info("{} odom poses subscribed!".format(len(self.odom_data_dict)))
 
         # subscribe to spatial detections
-        self.spatial_subs = [
-            self.create_subscription(SpatialDetectionArray, "/turtle0{}/color/yolov4_Spatial_detections".format(i), 
-            self.create_spatial_cb(i), qos_profile=self.qos)  for i in robot_ids]
-        self.get_logger().info("{} spatial detections subscribed!".format(len(self.spatial_dict)))
+        # self.spatial_subs = [
+        #     self.create_subscription(SpatialDetectionArray, "/turtle0{}/color/yolov4_Spatial_detections".format(i), 
+        #     self.create_spatial_cb(i), qos_profile=self.qos)  for i in robot_ids]
+        # self.get_logger().info("{} spatial detections subscribed!".format(len(self.spatial_dict)))
 
+        # pf relative poses publishers
+        self.real_pose_publishers = [self.create_publisher(PoseStamped, '/real_turtle0{}_pose'.format(t), qos_profile=self.qos) for t in robot_ids]
+        self.relative_pose_publishers = [self.create_publisher(PoseStamped, '/pf_turtle0{}_pose'.format(t), qos_profile=self.qos) for t in robot_ids[1:]]
+
+        time.sleep(1.0)
         self.get_logger().info("\\\\\\Class Initialized Done//////")
         
         
@@ -90,6 +98,12 @@ class UWBRelativePositionNode(Node) :
         
     def mocap_pose_cb(self, p, pos):
         self.mocap_data_dict[p] = np.array([pos.pose.position.x, pos.pose.position.y, pos.pose.position.z, pos.pose.orientation.x, pos.pose.orientation.y, pos.pose.orientation.z, pos.pose.orientation.w])  
+        true_relative_pos = pos
+        true_relative_pos.header.stamp = self.get_clock().now().to_msg()
+        true_relative_pos.pose.position.x =  pos.pose.position.x - self.turtles_mocaps[0][0]
+        true_relative_pos.pose.position.y =  pos.pose.position.y - self.turtles_mocaps[0][1]
+        true_relative_pos.pose.position.z = 0.0
+        self.real_pose_publishers[p].publish(true_relative_pos)
 
     def create_odom_cb(self, p):
         return lambda odom : self.odom_cb(p, odom)
@@ -97,11 +111,11 @@ class UWBRelativePositionNode(Node) :
     def odom_cb(self, p, odom):
         self.odom_data_dict[p] = np.array([odom.pose.pose.position.x, odom.pose.pose.position.y, odom.pose.pose.position.z, odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w])
 
-    def create_spatial_cb(self, p):
-        return lambda detections : self.spatial_cb(p, detections)
+    # def create_spatial_cb(self, p):
+    #     return lambda detections : self.spatial_cb(p, detections)
         
-    def spatial_cb(self, p, detections):
-        self.spatial_dict[p] = np.array([[det.position.x, det.position.y, det.position.y] for det in detections.detections])
+    # def spatial_cb(self, p, detections):
+    #     self.spatial_dict[p] = np.array([[det.position.x, det.position.y, det.position.y] for det in detections.detections])
 
     '''
         Update the data for the particle filter
@@ -138,8 +152,28 @@ class UWBRelativePositionNode(Node) :
             # self.get_logger().info("Updating particle filter......")
             self.pf_estimator.update_filter()
             # self.pf_estimator.plot_particles()
+            self.relative_poses_pub()
             print(">>>>>> robot poses saved!")
             # print("\n")
+
+    def relative_poses_pub(self):
+        # publish pf relative pose
+        # print("self.pf_estimator.get_robot_poses()", self.pf_estimator.get_robot_poses())
+        pose_cur = self.pf_estimator.get_robot_poses()[-1]
+        print("pose_cur", pose_cur)
+        for i in range(len(self.robot_ids[1:])):
+            # print("pose", self.pf_estimator.pf.mean_state)
+            # print(i)
+            relative_pose = PoseStamped()
+            relative_pose.header.frame_id = "base_link"
+            relative_pose.header.stamp = self.get_clock().now().to_msg()
+            # relative_pose.pose.position.x = self.pf_estimator.pf.mean_state[2*i]
+            # relative_pose.pose.position.y = self.pf_estimator.pf.mean_state[2*i+1]
+            relative_pose.pose.position.x = pose_cur[2*i]
+            relative_pose.pose.position.y = pose_cur[2*i+1]
+            relative_pose.pose.position.z = 0.0
+            # relative_pose.pose.orientation = self.pf_estimator.odom_save[i].pose.pose.orientation
+            self.relative_pose_publishers[i].publish(relative_pose)   
 
     def __del__(self):
         # self.get_logger().info(np.array(self.pose_estimations).shape)
