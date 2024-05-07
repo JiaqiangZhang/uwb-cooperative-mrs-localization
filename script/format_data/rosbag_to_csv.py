@@ -43,44 +43,47 @@ class BiasEstimation(Node) :
 
         self.data_save=[]
 
-        self.uwb_pairs = [  [1,2],
+        self.uwb_pairs = [  [0,1],
+                            [0,2],
+                            [0,3],
+                            [0,4],
+                            # [0,5],
+                            # [0,6],
+                            # [0,7],
+                            [1,2],
                             [1,3],
                             [1,4],
-                            [1,5],
-                            [1,6],
-                            [1,7],
-                            [1,8],
+                            # [1,5],
+                            # [1,7],
                             [2,3],
                             [2,4],
-                            [2,5],
-                            [2,6],
-                            [2,7],
-                            [2,8],
+                            # [2,5],
+                            # [2,6],
+                            # [2,7],
                             [3,4],
-                            [3,5],
-                            [3,6],
-                            [3,7],
-                            [3,8],
-                            [4,5],
-                            [4,6],
-                            [4,7],
-                            [4,8],
-                            [5,6],
-                            [5,8],
-                            [6,7],
-                            [6,8],
-                            [7,5],
-                            [7,8]]
+                            # [3,5],
+                            # [3,6],
+                            # [3,7],
+                            # [4,5],
+                            # [4,6],
+                            # [4,7],
+                            # [5,6],
+                            # [5,7],
+                            # [6,7]
+                            ]
 
-        self.turtlebot_num=[1,2,3,4,5]
+        self.turtlebot_num=[0,1,2,3,4]
 
         #Subscribers
 
         #UWB topics
         for pair in self.uwb_pairs:
             number = int('{}{}'.format(pair[0],pair[1]))
+            
             # self.uwb_ranges[number] = []
             # self.uwb_ranges[number].append('uwb_dis{}'.format(number))
+            number = f"{number:02}"
+            # print(f"number:{number}")
             dis_sub = self.create_subscription(Range,'/uwb/tof/n_{}/n_{}/distance'.format(pair[0],pair[1]),self.cbuwb(number), 10)
             self.dis_subscribers.append(dis_sub)
 
@@ -110,39 +113,40 @@ class BiasEstimation(Node) :
             self.mocap_pose[k]=[msg.pose.position.x, msg.pose.position.y, msg.pose.position.z]
             self.mocap_ori[k]=msg.pose.orientation
             # print(f"mocap: {k}")
+        # print(cap_pose)
         return cap_pose
 
     def euler_from_quaternion(self,pose):
-            """
-            Convert a quaternion into euler angles (roll, pitch, yaw)
-            roll is rotation around x in radians (counterclockwise)
-            pitch is rotation around y in radians (counterclockwise)
-            yaw is rotation around z in radians (counterclockwise)
-            """
+        """
+        Convert a quaternion into euler angles (roll, pitch, yaw)
+        roll is rotation around x in radians (counterclockwise)
+        pitch is rotation around y in radians (counterclockwise)
+        yaw is rotation around z in radians (counterclockwise)
+        """
 
-            x =  pose.x
-            y =  pose.y
-            z =  pose.z
-            w =  pose.w
+        x =  pose.x
+        y =  pose.y
+        z =  pose.z
+        w =  pose.w
 
-            t0 = +2.0 * (w * x + y * z)
-            t1 = +1.0 - 2.0 * (x * x + y * y)
-            roll_x = math.atan2(t0, t1)
-        
-            t2 = +2.0 * (w * y - z * x)
-            t2 = +1.0 if t2 > +1.0 else t2
-            t2 = -1.0 if t2 < -1.0 else t2
-            pitch_y = math.asin(t2)
-        
-            t3 = +2.0 * (w * z + x * y)
-            t4 = +1.0 - 2.0 * (y * y + z * z)
-            yaw_z = math.atan2(t3, t4)
-        
-            # return roll_x, pitch_y, yaw_z # in radians
-            return yaw_z
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll_x = math.atan2(t0, t1)
+    
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch_y = math.asin(t2)
+    
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw_z = math.atan2(t3, t4)
+    
+        # return roll_x, pitch_y, yaw_z # in radians
+        return yaw_z
 
     def timer_save(self): # for updating measurements
-        if self.check: 
+        if self.check and self.uwb_ranges: 
             print('------------------------')
             # print(self.uwb_ranges)
             # print(self.mocap_pose)
@@ -154,6 +158,8 @@ class BiasEstimation(Node) :
                 # print(pairs)
                 mocap_range = np.linalg.norm(np.array(self.mocap_pose[pairs[0]])-np.array(self.mocap_pose[pairs[1]]))
                 uwb_comb="{}{}".format(pairs[0],pairs[1])
+                uwb_comb = f"{uwb_comb:02}"
+                print(f"{uwb_comb}")
 
                 # #######
                 # #uwb 7 is in turtlebot 1
@@ -199,7 +205,7 @@ class BiasEstimation(Node) :
             # self.data_save_np=np.array(self.data_save)
             # print(self.data_save_np)
 
-            np.savetxt("train_newdata.csv", self.data_save,fmt=('%s'), header="timestamp,node1,node2,uwb_range,mocap_range,tb_node1_yaw,tb_node2_yaw,error",delimiter=',',comments='')
+            np.savetxt("test_newdata.csv", self.data_save,fmt=('%s'), header="timestamp,node1,node2,uwb_range,mocap_range,tb_node1_yaw,tb_node2_yaw,error",delimiter=',',comments='')
 
         
         
